@@ -6,6 +6,7 @@
 #define SEARCH_ENGINE_REQUESTCLASS_H
 #include <string>
 #include "nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 
 class requestClass {
 public:
@@ -13,9 +14,9 @@ public:
         openFileRequest(fileRequest);
     };
     void openFileRequest(std::string requestClass);
-
+    bool controlRequestMessage();
 private:
-    std::vector<std::string> request;
+    std::vector<std::string> _requestMessage;
 
 };
 

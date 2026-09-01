@@ -11,9 +11,11 @@
 class configClass {
 public:
     configClass(std::string fileNameConfig) {
-    openFileConfig(fileNameConfig);
+    openConfigFile(fileNameConfig);
     };
-    void openFileConfig(std::string fileNameConfig);
+    void openConfigFile(std::string fileNameConfig);
+    void findTxtFile();
+    bool controlTxtFile(std::ifstream &userFileTxt);
     void printConfig();
     //~configClass() {    };
 
@@ -23,6 +25,7 @@ private:
         std::string version;
         int max_responses;
     } _configVar;
+    std::vector<std::string> _configFiles;
 
 /*    struct configFile {
         std::string name;
