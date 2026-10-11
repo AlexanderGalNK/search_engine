@@ -192,12 +192,12 @@ void ConverterJSON::createAnswerFile(std::string fileNameAnswer) {
         requestStruct requestStr;
 
         // Проверяем все запросы из request.json
-        int counterRequest = 0;
+        int counterRequest = 1;
         // словарь для хранения ответов
         answerMap answers;
         // берем одно поисковое выражение
         for (auto &item : _requestMessage) {
-           // requestStr.relevance.push_back(relevanceStr);
+            //
             requestStr.requestId = std::format("request{:03}", counterRequest);
             // ищем выражение в файлах
             findRequestInFile(item, requestStr);
@@ -220,20 +220,25 @@ void ConverterJSON::createAnswerFile(std::string fileNameAnswer) {
     }
 }
 
+// берем одно поисковое выражение из request.json
 void ConverterJSON::findRequestInFile(std::string requestMes,requestStruct &var) {
     var.result = false;
+    int docidVar=0;
     for (auto &findItem : vecConfigFiles) {
         // ищем подстроку в строке (requestMes in text File)
         if (((findItem.text.find(requestMes) != std::string::npos)&& findItem.goodTxtFile)) {
             var.result=true;
             relevanceStruct relevanceStr;
 
-            relevanceStr.docid = 2;
+            relevanceStr.docid = docidVar;
             relevanceStr.rank  = 0.745;
-            break;
+            var.relevance.push_back(relevanceStr);
+            //break;
         } else {
+            if (!var.result)
             var.result=false;
         }
+        docidVar++;     // increment ID document
     }
 }
 
