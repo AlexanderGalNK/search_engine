@@ -54,6 +54,10 @@ void InvertedIndex::UpdateDocumentBase(std::vector<std::string> input_docs) {
     // Потоки будут завершены автоматически в деструкторе joiner
 }
 
+std::map<std::string, std::vector<Entry>> InvertedIndex::getTextBaseAfterParsing() {
+    return freq_dictionary;
+}
+
 std::vector<Entry> InvertedIndex::GetWordCount(const std::string& word) {
     auto it = freq_dictionary.find(word);
     if (it == freq_dictionary.end()) {

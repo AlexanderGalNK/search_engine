@@ -3,19 +3,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "main.h"
 
-/**
- * @struct Entry
- * Структура, описывающая частоту слова в конкретном документе
- */
-struct Entry {
-    size_t doc_id;  ///< ID документа
-    size_t count;   ///< Количество вхождений слова в документ
-
-    bool operator==(const Entry& other) const {
-        return doc_id == other.doc_id && count == other.count;
-    }
-};
 
 /**
  * @class InvertedIndex
@@ -31,6 +20,7 @@ public:
      */
     void UpdateDocumentBase(std::vector<std::string> input_docs);
 
+    std::map<std::string, std::vector<Entry>> getTextBaseAfterParsing( );
     /**
      * Получает список документов, в которых встречается слово, и его частоту.
      * @param word Слово, для которого требуется статистика.

@@ -25,7 +25,7 @@ public:
 ConverterJSON::ConverterJSON(std::string fileNameConfig) {
     openConfigFile(fileNameConfig);
     openFileRequest("requests.json");
-    createAnswerFile("answers.json");
+    //createAnswerFile("answers.json");
 }
 
 void ConverterJSON::openConfigFile(std::string fileNameConfig) {
@@ -117,7 +117,12 @@ bool ConverterJSON::controlTxtFile(std::ifstream &userFileTxt, oneConfigFileDesc
         if (counter>1000) return false;
         if (textWorld.length() > 100) return false;
     }
+    var.totalCountWorldInText = counter;
     return true;
+}
+
+std::vector<std::string> ConverterJSON::GetRequests() {
+    return this->_requestMessage;
 }
 
 void ConverterJSON::openFileRequest(std::string requestPath) {
@@ -201,16 +206,16 @@ void ConverterJSON::createAnswerFile(std::string fileNameAnswer) {
             requestStr.requestId = std::format("request{:03}", counterRequest);
             // ищем выражение в файлах
             findRequestInFile(item, requestStr);
-
+            sortRequest(requestStr);
 
             // Если нужно несколько запросов, добавляем их в map
             answers[requestStr.requestId] = requestStr;
             counterRequest++;
             requestStr.relevance.clear();
         }
+
         json data;
         data["answers"] = answers;
-
         outFile << data.dump(4); // 4 — отступ для читаемости
 
         // Не забываем закрыть файл
@@ -218,51 +223,83 @@ void ConverterJSON::createAnswerFile(std::string fileNameAnswer) {
     } else {
         std::cerr << "Не удалось открыть файл для записи!\n";
     }
+
 }
 
-// берем одно поисковое выражение из request.json
+
 void ConverterJSON::findRequestInFile(std::string requestMes,requestStruct &var) {
     var.result = false;
     int docidVar=0;
     for (auto &findItem : vecConfigFiles) {
-        // ищем подстроку в строке (requestMes in text File)
-        if (((findItem.text.find(requestMes) != std::string::npos)&& findItem.goodTxtFile)) {
-            var.result=true;
+        // ищем подстроку (по одному слову textWorld) в строке (in text File)
+        std::string textWorld;
+        std::stringstream ss{requestMes};
+        float currentRank = 0;
+        while (ss >> textWorld) {
+            if (((findItem.text.find(textWorld) != std::string::npos)&& findItem.goodTxtFile)) {
+                var.result=true;
+                currentRank += calculRank(textWorld, docidVar);
+            } else {
+                if (!var.result)
+                    var.result=false;
+            }
+        }
+        // Если нашелся хотя бы один запрос
+        if ((var.result) && (currentRank>0)){
             relevanceStruct relevanceStr;
-
             relevanceStr.docid = docidVar;
-            relevanceStr.rank  = 0.745;
+            relevanceStr.rank = currentRank;
             var.relevance.push_back(relevanceStr);
-            //break;
-        } else {
-            if (!var.result)
-            var.result=false;
         }
         docidVar++;     // increment ID document
     }
 }
 
-/*
-{
-    "answers": {
-        "request001": {
-            "result": "true",
-            "relevance": [
-            { "docid": 0, "rank": 0.989 },
-            { "docid": 1, "rank": 0.897 },
-            { "docid": 2, "rank": 0.750 }
-            ]
-            },
-            "request002": {
-                "result": "true",
-                "relevance": [
-                { "docid": 0, "rank": 0.769 }
-                ]
-                },
-                "request003": {
-                    "result": "false"
-                    }
+float ConverterJSON::calculRank(std::string textForSearch, int docidSearch) {
+    float rankVar=0;
+
+        auto it = freq_dictionary.find(textForSearch);
+        if (it != freq_dictionary.end()) {
+            // должны посмотреть в данном текстовом файле есть нет поисковое выражение
+            // Выделяем из общего словаря информацию по поисковому слову (doc_id и rank)
+            std::vector<Entry> varEntry = it->second;
+            // Ищем в этом векторе совпадание docid and docIDSearch (слово встречается
+            // именно в этом тексте
+            for (auto &iter : varEntry) {
+                if (iter.doc_id == docidSearch) {
+                    rankVar += (float) iter.count / vecConfigFiles[docidSearch].totalCountWorldInText;
+                }
+            }
+        }
+    return rankVar;
+}
+
+void ConverterJSON::getTextBaseAfterParsing(std::map<std::string, std::vector<Entry>> var) {
+    // Полностью очищаем словарь с потенциальным освобождением памяти
+    std::map<std::string, std::vector<Entry>>().swap(freq_dictionary);
+    // Записываем новые данные в словарь ConverterJSON
+    for (auto &item : var) {
+        this->freq_dictionary.insert(std::pair<std::string, std::vector<Entry>>(item.first, item.second));//std::vector<Entry>()));
     }
-    */
+}
 
+void ConverterJSON::sortRequest(requestStruct &requestStr) {
+for (int i = 0; i < requestStr.relevance.size(); i++) {
+    for (int j = 0; j < requestStr.relevance.size(); j++) {
+        if (requestStr.relevance[j].rank < requestStr.relevance[j+1].rank) {
+            std::swap(requestStr.relevance[j], requestStr.relevance[j+1]);
+        }
+    }
+}
+}
 
+// Метод возвращает вектор текстов из фалов
+//т.е. тексты самих файлов из config.json
+std::vector<std::string> ConverterJSON::GetTextDocuments() {
+    std::vector<std::string> textDocuments;
+    textDocuments.clear();
+    for (auto &doc : vecConfigFiles) {
+        textDocuments.push_back(doc.text);
+    }
+    return textDocuments;
+}

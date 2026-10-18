@@ -11,6 +11,7 @@ add_executable(search_engine main.cpp
         header/ConverterJSON.h
         header/InvertedIndex.h
         source/InvertedIndex.cpp
+        header/main.h
 )
 
 target_link_libraries(search_engine PRIVATE nlohmann_json::nlohmann_json)
