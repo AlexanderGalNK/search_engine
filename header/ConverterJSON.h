@@ -106,6 +106,10 @@ public:
      */
     void sortRequest(requestStruct &requestStr);
 
+    // Изучаю тестирование при помощи GoogleTest
+    // Пробный метод
+    int blablaTest(int arg1);
+
 };
 
 

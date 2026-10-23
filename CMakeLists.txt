@@ -29,7 +29,9 @@ set(gtest_disable_pthreads)
 FetchContent_MakeAvailable(googletest)
 enable_testing()
 
-add_executable(sample_test source/test.cpp)  # предположим, твой код лежит в test.cpp
+add_executable(sample_test source/test.cpp
+        header/InvertedIndex.h
+        source/InvertedIndex.cpp)  # предположим, твой код лежит в test.cpp
 
 target_link_libraries(sample_test PRIVATE gtest_main)
 include(GoogleTest)

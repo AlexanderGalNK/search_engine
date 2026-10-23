@@ -293,6 +293,10 @@ for (int i = 0; i < requestStr.relevance.size(); i++) {
 }
 }
 
+int ConverterJSON::blablaTest(int arg1) {
+    return arg1 * 2;
+}
+
 // Метод возвращает вектор текстов из фалов
 //т.е. тексты самих файлов из config.json
 std::vector<std::string> ConverterJSON::GetTextDocuments() {
