@@ -12,6 +12,8 @@ add_executable(search_engine main.cpp
         header/InvertedIndex.h
         source/InvertedIndex.cpp
         header/main.h
+        source/SearchServer.cpp
+        header/SearchServer.h
 )
 
 target_link_libraries(search_engine PRIVATE nlohmann_json::nlohmann_json)
@@ -30,8 +32,8 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(sample_test source/test.cpp
-        header/InvertedIndex.h
-        source/InvertedIndex.cpp)  # предположим, твой код лежит в test.cpp
+        #header/InvertedIndex.h)
+        source/InvertedIndex.cpp)
 
 target_link_libraries(sample_test PRIVATE gtest_main)
 include(GoogleTest)

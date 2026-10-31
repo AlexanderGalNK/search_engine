@@ -98,10 +98,11 @@ public:
      * поискового текста (сколько раз), k - общее количество слов
      */
     float calculRank(std::string textForSearch, int docidSearch);
+
     void getTextBaseAfterParsing(std::map<std::string, std::vector<Entry>> var);
 
     /*
-     *Метод для сортировки файлов docid по рангу rank
+     * Метод для сортировки файлов docid по рангу rank
      * @param requestStruct описывающий ответ на запрос
      */
     void sortRequest(requestStruct &requestStr);
