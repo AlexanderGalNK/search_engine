@@ -33,7 +33,8 @@ enable_testing()
 
 add_executable(sample_test source/test.cpp
         #header/InvertedIndex.h)
-        source/InvertedIndex.cpp)
+        source/InvertedIndex.cpp
+        source/SearchServer.cpp)
 
 target_link_libraries(sample_test PRIVATE gtest_main)
 include(GoogleTest)

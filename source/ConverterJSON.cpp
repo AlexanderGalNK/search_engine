@@ -188,7 +188,7 @@ void to_json(json& j, const requestStruct& v) {
     j["relevance"] = v.relevance;
 }
 
-void ConverterJSON::createAnswerFile(std::string fileNameAnswer) {
+void ConverterJSON::createAnswerFile(std::string fileNameAnswer,  std::vector<std::vector<RelativeIndex>> varResponse) {
     // Создаём объект ofstream и открываем файл для перезаписи
     std::ofstream outFile(fileNameAnswer);
 
@@ -196,17 +196,18 @@ void ConverterJSON::createAnswerFile(std::string fileNameAnswer) {
     if (outFile.is_open()) {
         requestStruct requestStr;
 
-        // Проверяем все запросы из request.json
-        int counterRequest = 1;
         // словарь для хранения ответов
         answerMap answers;
-        // берем одно поисковое выражение
-        for (auto &item : _requestMessage) {
-            //
+        // счетчик для изменения id запроса
+        int counterRequest = 1;
+        for (auto &item : varResponse) {
             requestStr.requestId = std::format("request{:03}", counterRequest);
-            // ищем выражение в файлах
-            findRequestInFile(item, requestStr);
-            sortRequest(requestStr);
+            if (item.size()) {  // Запрос не пустой
+                requestStr.result = true;
+                requestStr.relevance = item;
+            } else {    // Нет совпадений по поиску rank =0
+                requestStr.result = false;
+            }
 
             // Если нужно несколько запросов, добавляем их в map
             answers[requestStr.requestId] = requestStr;
@@ -246,8 +247,8 @@ void ConverterJSON::findRequestInFile(std::string requestMes,requestStruct &var)
         }
         // Если нашелся хотя бы один запрос
         if ((var.result) && (currentRank>0)){
-            relevanceStruct relevanceStr;
-            relevanceStr.docid = docidVar;
+            RelativeIndex relevanceStr;
+            relevanceStr.doc_id = docidVar;
             relevanceStr.rank = currentRank;
             var.relevance.push_back(relevanceStr);
         }
@@ -293,9 +294,10 @@ for (int i = 0; i < requestStr.relevance.size(); i++) {
 }
 }
 
-int ConverterJSON::blablaTest(int arg1) {
-    return arg1 * 2;
+int ConverterJSON::GetResponsesLimit() {
+    return _configVar.max_responses;
 }
+
 
 // Метод возвращает вектор текстов из фалов
 //т.е. тексты самих файлов из config.json

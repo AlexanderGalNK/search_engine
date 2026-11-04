@@ -6,15 +6,14 @@
 #define SEARCH_ENGINE_SEARCHSERVER_H
 
 #include "../header/InvertedIndex.h"
-struct RelativeIndex{
+/*struct RelativeIndex{
     size_t doc_id;
     float rank;
     bool operator==(const RelativeIndex &other) const
         {return(doc_id== other.doc_id&&rank==other.rank);
     }
 };
-
-
+*/
 
 class SearchServer {
     public:
@@ -30,7 +29,9 @@ class SearchServer {
     * @return возвращает отсортированный список релевантных ответов для заданных запросов
     */
     std::vector<std::vector<RelativeIndex>>search(const std::vector<std::string>& queries_input);
+
 private:
+
     InvertedIndex _index;
 };
 
