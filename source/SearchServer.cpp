@@ -86,8 +86,8 @@ std::vector<std::vector<RelativeIndex>> SearchServer::search(const std::vector<s
 
         // упорядочиваем информацию в порядке снижения релевантности (rank)
         for (int i=0; i < curRankOneRequest.size(); i++) {
-            for (int j=0; j < curRankOneRequest.size(); j++) {
-                if (curRankOneRequest[j].rank < curRankOneRequest[j+1].rank) {
+            for (int j=0; j < curRankOneRequest.size()-1; j++) {
+                if ((curRankOneRequest[j].rank < curRankOneRequest[j+1].rank) ) {
                     std::swap(curRankOneRequest[j].doc_id,  (curRankOneRequest[j+1].doc_id));
                     std::swap(curRankOneRequest[j].rank,  (curRankOneRequest[j+1].rank));
                 }

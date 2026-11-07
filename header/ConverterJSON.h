@@ -7,7 +7,6 @@
 #include <string>
 #include "nlohmann/json.hpp"
 #include "main.h"
-#include <format>
 
 /**
 *Класс для работы с JSON-файлами
@@ -23,7 +22,7 @@ struct relevanceStruct {
 struct requestStruct {
     std::string requestId;
     bool result;
-    std::vector <RelativeIndex> relevance;
+    std::vector <relevanceStruct> relevance;
 };
 
 using answerMap = std::map<std::string, requestStruct>;
@@ -86,28 +85,8 @@ public:
 
     // metod for work answer
     void createAnswerFile(std::string fileNameAnswer, std::vector<std::vector<RelativeIndex>> );
-    /*
-     *Метод для оценки поискового выражения из request.json
-     * @param requestMes какой текст искать (из файла request.json),
-     *        &var.text  передаются по ссылке сами тексты
-     * Метод заполняет ответ на поиск в поле requestStruct
-     */
-    void findRequestInFile(std::string requestMes, requestStruct &var);
-    /*
-     * Метод подсчета текущей релевантности
-     * @param получает текст для поиска и номер поискового файла
-     * return число рейтинг из расчета TF= (n/k), где n- встречаемость
-     * поискового текста (сколько раз), k - общее количество слов
-     */
-    float calculRank(std::string textForSearch, int docidSearch);
 
-    void getTextBaseAfterParsing(std::map<std::string, std::vector<Entry>> var);
-
-    /*
-     * Метод для сортировки файлов docid по рангу rank
-     * @param requestStruct описывающий ответ на запрос
-     */
-    void sortRequest(requestStruct &requestStr);
+    //void getTextBaseAfterParsing(std::map<std::string, std::vector<Entry>> var);
 
     /**
     * Метод считывает поле max_responses для определения предельного
@@ -115,7 +94,6 @@ public:
     * @return
     */
     int GetResponsesLimit();
-
 };
 
 

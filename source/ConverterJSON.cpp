@@ -7,6 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <exception>
+#include <format>
+
 using json =nlohmann::json;
 
 class InvalidException : public std::exception {
@@ -25,7 +27,6 @@ public:
 ConverterJSON::ConverterJSON(std::string fileNameConfig) {
     openConfigFile(fileNameConfig);
     openFileRequest("requests.json");
-    //createAnswerFile("answers.json");
 }
 
 void ConverterJSON::openConfigFile(std::string fileNameConfig) {
@@ -88,8 +89,6 @@ void ConverterJSON::findTxtFile() {
             iter.fileIsFound = true;    // file founded
             if (controlTxtFile(findTxtFile, iter)) {
                 iter.goodTxtFile = true;
-                // write text from file to string
-//                int i= findTxtFile.tellg();
                 if (findTxtFile.is_open())
                     findTxtFile.seekg(0 , std::ios::beg);
                 std::string strBuffer = "";
@@ -103,7 +102,6 @@ void ConverterJSON::findTxtFile() {
         } else {
             iter.fileIsFound = false;    // file not found
         }
-        //findTxtFile.close();
     }
 }
 
@@ -204,11 +202,12 @@ void ConverterJSON::createAnswerFile(std::string fileNameAnswer,  std::vector<st
             requestStr.requestId = std::format("request{:03}", counterRequest);
             if (item.size()) {  // Запрос не пустой
                 requestStr.result = true;
-                requestStr.relevance = item;
+                for (auto &it : item) {
+                    requestStr.relevance.push_back({it.doc_id, it.rank});
+                }
             } else {    // Нет совпадений по поиску rank =0
                 requestStr.result = false;
             }
-
             // Если нужно несколько запросов, добавляем их в map
             answers[requestStr.requestId] = requestStr;
             counterRequest++;
@@ -226,55 +225,7 @@ void ConverterJSON::createAnswerFile(std::string fileNameAnswer,  std::vector<st
     }
 
 }
-
-
-void ConverterJSON::findRequestInFile(std::string requestMes,requestStruct &var) {
-    var.result = false;
-    int docidVar=0;
-    for (auto &findItem : vecConfigFiles) {
-        // ищем подстроку (по одному слову textWorld) в строке (in text File)
-        std::string textWorld;
-        std::stringstream ss{requestMes};
-        float currentRank = 0;
-        while (ss >> textWorld) {
-            if (((findItem.text.find(textWorld) != std::string::npos)&& findItem.goodTxtFile)) {
-                var.result=true;
-                currentRank += calculRank(textWorld, docidVar);
-            } else {
-                if (!var.result)
-                    var.result=false;
-            }
-        }
-        // Если нашелся хотя бы один запрос
-        if ((var.result) && (currentRank>0)){
-            RelativeIndex relevanceStr;
-            relevanceStr.doc_id = docidVar;
-            relevanceStr.rank = currentRank;
-            var.relevance.push_back(relevanceStr);
-        }
-        docidVar++;     // increment ID document
-    }
-}
-
-float ConverterJSON::calculRank(std::string textForSearch, int docidSearch) {
-    float rankVar=0;
-
-        auto it = freq_dictionary.find(textForSearch);
-        if (it != freq_dictionary.end()) {
-            // должны посмотреть в данном текстовом файле есть нет поисковое выражение
-            // Выделяем из общего словаря информацию по поисковому слову (doc_id и rank)
-            std::vector<Entry> varEntry = it->second;
-            // Ищем в этом векторе совпадание docid and docIDSearch (слово встречается
-            // именно в этом тексте
-            for (auto &iter : varEntry) {
-                if (iter.doc_id == docidSearch) {
-                    rankVar += (float) iter.count / vecConfigFiles[docidSearch].totalCountWorldInText;
-                }
-            }
-        }
-    return rankVar;
-}
-
+/*
 void ConverterJSON::getTextBaseAfterParsing(std::map<std::string, std::vector<Entry>> var) {
     // Полностью очищаем словарь с потенциальным освобождением памяти
     std::map<std::string, std::vector<Entry>>().swap(freq_dictionary);
@@ -283,16 +234,7 @@ void ConverterJSON::getTextBaseAfterParsing(std::map<std::string, std::vector<En
         this->freq_dictionary.insert(std::pair<std::string, std::vector<Entry>>(item.first, item.second));//std::vector<Entry>()));
     }
 }
-
-void ConverterJSON::sortRequest(requestStruct &requestStr) {
-for (int i = 0; i < requestStr.relevance.size(); i++) {
-    for (int j = 0; j < requestStr.relevance.size(); j++) {
-        if (requestStr.relevance[j].rank < requestStr.relevance[j+1].rank) {
-            std::swap(requestStr.relevance[j], requestStr.relevance[j+1]);
-        }
-    }
-}
-}
+*/
 
 int ConverterJSON::GetResponsesLimit() {
     return _configVar.max_responses;
