@@ -60,10 +60,11 @@ void ConverterJSON::openConfigFile(std::string fileNameConfig) {
                 // из файла config.json
                 // записываем пути в переменную-структуру vecConfigFiles с описанием файлов
                 for (auto &item : configArray) {
-                    oneConfigFileDescription oneVar;
+                    oneTXTFileDescription oneVar;
                     oneVar.userPath=item.get<std::string>();
                     vecConfigFiles.push_back(oneVar);
                 }
+                std::cout << "Config file sucsefull open" << std::endl;
             }
         }else {
             //file config.json not open
@@ -79,7 +80,6 @@ void ConverterJSON::openConfigFile(std::string fileNameConfig) {
 
 }
 
-// ищем файлы по путям, указанным в config.json
 void ConverterJSON::findTxtFile() {
     //Нужно сделать итерацию по вектору для проверки путей. Существуют ли по ним файлы, валидны они или нет
     for (auto &iter : vecConfigFiles) {
@@ -105,8 +105,8 @@ void ConverterJSON::findTxtFile() {
     }
 }
 
-// control file. Less than 1000 worlds and every worlds less than 100 characters
-bool ConverterJSON::controlTxtFile(std::ifstream &userFileTxt, oneConfigFileDescription &var) {
+
+bool ConverterJSON::controlTxtFile(std::ifstream &userFileTxt, oneTXTFileDescription &var) {
     std::string textWorld;
     int counter = 0;
     while (userFileTxt>>textWorld) {
@@ -115,7 +115,6 @@ bool ConverterJSON::controlTxtFile(std::ifstream &userFileTxt, oneConfigFileDesc
         if (counter>1000) return false;
         if (textWorld.length() > 100) return false;
     }
-    var.totalCountWorldInText = counter;
     return true;
 }
 
@@ -154,11 +153,10 @@ void ConverterJSON::openFileRequest(std::string requestPath) {
     }
     request_file.close();
     if (!controlRequestMessage()) std::cout << std::endl << "Request File Error" << std::endl;
+        else std::cout << std::endl << "Request File Success" << std::endl;
 }
 
 bool ConverterJSON::controlRequestMessage() {
-    // проверяем чтобы поле содержало не более 1000 запросов, каждый из
-    // которых включает от одного до десяти слов.
     int counter = 0;
     // иттерация по вектору
     for (auto &requestMessage : _requestMessage) {
@@ -220,21 +218,11 @@ void ConverterJSON::createAnswerFile(std::string fileNameAnswer,  std::vector<st
 
         // Не забываем закрыть файл
         outFile.close();
+        std::cout << std::endl << "Answer file generated" << std::endl;
     } else {
         std::cerr << "Не удалось открыть файл для записи!\n";
     }
-
 }
-/*
-void ConverterJSON::getTextBaseAfterParsing(std::map<std::string, std::vector<Entry>> var) {
-    // Полностью очищаем словарь с потенциальным освобождением памяти
-    std::map<std::string, std::vector<Entry>>().swap(freq_dictionary);
-    // Записываем новые данные в словарь ConverterJSON
-    for (auto &item : var) {
-        this->freq_dictionary.insert(std::pair<std::string, std::vector<Entry>>(item.first, item.second));//std::vector<Entry>()));
-    }
-}
-*/
 
 int ConverterJSON::GetResponsesLimit() {
     return _configVar.max_responses;

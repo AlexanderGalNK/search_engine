@@ -110,6 +110,5 @@ std::vector<std::vector<RelativeIndex>> SearchServer::search(const std::vector<s
         result.push_back(curRankOneRequest);
     }
 
-
     return result;
 }

@@ -1,12 +1,10 @@
-#include <iostream>
 #include <string>
-#include <fstream>
+#include <iostream>
+#include <conio.h> // для getch()
 
 #include "header/ConverterJSON.h"
 #include "header/InvertedIndex.h"
 #include "header/SearchServer.h"
-
-#include "nlohmann/json.hpp"
 
 int main() {
     // класс для работы с JSON объектами
@@ -23,6 +21,5 @@ int main() {
 
     // Создаем файл с ответами на поисковые запросы
     configFileVar.createAnswerFile("answers.json", RelevanteBase.search(configFileVar.GetRequests()));
-
 
 }
